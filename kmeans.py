@@ -2,7 +2,7 @@ import numpy as np, matplotlib.pyplot as plt
 from operator import itemgetter
 from math import sqrt
 from copy import deepcopy
-from random import random
+from random import random, randint, uniform
 
 # k means
 class k_means:
@@ -53,14 +53,15 @@ def kd_tree(point_list=None, dimensions=None, depth=0):
             start = i * (len(point_list) // 4)
             end = len(point_list) // 4 * (i + 1)
             number = random()
+
             center = np.array([number, number])
 
-            division = np.array(point_list[start:end], dtype=dt) + center
+            division = np.array(point_list[start:end], dtype=dt)
 
             divided.append(division)
         divided = np.array(divided, dtype=dt)
         data = np.concatenate(divided, axis=0)
-        clusters_k = 3
+        clusters_k = 4
         n = data.shape[0]
         c = data.shape[1]
 
@@ -68,28 +69,24 @@ def kd_tree(point_list=None, dimensions=None, depth=0):
         std = np.std(data, axis=0)
         medoids = np.random.randn(clusters_k, c) * std + mean
 
-        medoids_old = np.zeros(medoids.shape)  # to store old centers
-        medoids_new = deepcopy(medoids)  # Store new centers
+        medoids_old = np.zeros(medoids.shape)
+        medoids_new = deepcopy(medoids)
         clusters = np.zeros(n)
         distances = np.zeros((n, clusters_k))
 
-        error = np.linalg.norm(medoids_new - medoids_old)
-
-        # When, after an update, the estimate of that center stays the same, exit loop
-        while error != 0:
-            # Measure the distance to every center
+        e_distance = np.linalg.norm(medoids_new - medoids_old)
+        while e_distance != 0:
             for i in range(clusters_k):
                 distances[:, i] = np.linalg.norm(data - medoids[i], axis=1)
-            # Assign all training data to closest center
             clusters = np.argmin(distances, axis=1)
 
-            centers_old = deepcopy(medoids_new)
-            # Calculate mean for every cluster and update the center
+            medoids_old = deepcopy(medoids_new)
             for i in range(clusters_k):
                 medoids_new[i] = np.mean(data[clusters == i], axis=0)
-            error = np.linalg.norm(medoids_new - centers_old)
-        plt.scatter(data[:, 0], data[:, 1], s=6, c="pink")
-        plt.scatter(medoids_new[:, 0], medoids_new[:, 1], marker='+', c="purple", s=150)
+            e_distance = np.linalg.norm(medoids_new - medoids_old)
+        for i in range(n):
+            plt.scatter(data[i, 0], data[i, 1], s=6, c='blue')
+        plt.scatter(medoids_new[:, 0], medoids_new[:, 1], marker='+', c="red", s=100)
 
 def euclidean_distance(first, second):
     distance = 0
@@ -132,8 +129,8 @@ def show_graph(nodeTree, dimension):
 
     plt.show()
 
-def read_file():
-    file = open("input.txt", 'r').read().splitlines()
+def read_file(path):
+    file = open(path, 'r').read().splitlines()
     coordinates = []
     n, k = [int(i) for i in file[0].split(" ")]
     for line in file[1:]:
