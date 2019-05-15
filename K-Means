@@ -1,0 +1,82 @@
+import random
+import numpy
+import matplotlib.pyplot as plt
+import math
+class KMeans:
+
+    def __init__(self, k,iterations = 100):
+        self.k = k
+        self.iterations = iterations
+        self.centers = {}
+        self.clusters = {}
+
+    def cluster(self, pointsList):
+        for i in range(self.k):
+            #self.centers[i] = pointsList[random.randint(0, len(pointsList)-1)]
+            self.centers[i] = pointsList[i]
+
+            for i in range(0, self.iterations):
+                self.clusters = {}
+                for i in range(self.k):
+                    self.clusters[i] = []
+                    
+    
+            for points in pointsList:
+                distances = [EuclideanDistance(points, self.centers[center]) for center in self.centers]
+                classi = distances.index(min(distances))
+                self.clusters[classi].append(points)
+                
+            previous = dict(self.centers)
+            
+            for classi in self.clusters:
+                self.centers[classi] = numpy.average(self.clusters[classi], axis = 0)
+                
+            for center in self.centers:
+                original = previous[center]
+                actual = self.centers[center]
+                
+            if numpy.sum(((actual-original)/original) * 100 < 0.0001):
+                break
+            
+        
+
+
+def main():
+    p1 = (0.8, 4)
+    p2 = (3, 0.5)
+    p3 = (1, 2)
+    p4 = (9, 3)
+    p5 = (5, 1)
+    p6 = (3, 6)
+    p7 = (7, 5)
+    p8 = (2, 2)
+    p9 = (1, 2)
+
+    tree1 = [p1, p2, p3, p4, p5, p6, p7, p8, p9]
+
+    means = KMeans(3,10)
+    means.cluster(tree1)
+    
+    colors = 10*["r","g","c","b"]
+    for center in means.centers:
+        plt.scatter(means.centers[center][0], means.centers[center][1], s = 120, marker = "x")
+        
+    for classification in means.clusters:
+        color = colors[classification]
+        for cluster in means.clusters:
+            plt.scatter(cluster[0], cluster[1], color = color, s = 40)
+            
+    plt.show()
+
+def EuclideanDistance(point1, point2):
+        distance = 0
+        for i in range(len(point1)):
+            distance += (point1[i] - point2[i])**2
+        
+        result = math.sqrt(distance)
+        
+        return result
+
+
+
+main()
