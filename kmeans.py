@@ -136,7 +136,6 @@ def read_file():
     file = open("input.txt", 'r').read().splitlines()
     coordinates = []
     n, k = [int(i) for i in file[0].split(" ")]
-    print(n,k)
     for line in file[1:]:
         tuple = [float(x) for x in line.strip("()").split(",")]
         coordinates.append(tuple)
